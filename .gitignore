@@ -1,0 +1,121 @@
+# PHP
+*.log
+*.tmp
+*.cache
+*.bak
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.staging
+
+# Database
+*.sql.gz
+*.sql.bak
+database/backups/
+
+# Uploads and user content
+upload/*
+!upload/.gitkeep
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+logs/
+*.log
+error.log
+access.log
+
+# Cache
+cache/
+tmp/
+temp/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Composer
+vendor/
+composer.lock
+composer.phar
+
+# Node.js (if using npm/yarn for frontend assets)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Build files
+dist/
+build/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Security sensitive files
+config/database.php
+config/secrets.php
+*.key
+*.pem
+*.crt
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Session files
+sessions/
+tmp/sessions/
+
+# Error and access logs
+error_log
+access_log
+
+# PHPStorm
+.idea/
+
+# NetBeans
+nbproject/
+
+# Eclipse
+.project
+.buildpath
+.settings/
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# TCPDF cache and temp files
+include/TCPDF/cache/
+include/TCPDF/images/_cache/
+
+# Custom application specific
+config/local.php
+config/production.php
