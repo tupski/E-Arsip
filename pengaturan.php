@@ -25,23 +25,41 @@ if(!isset($_SESSION['admin'])){
 
         //jika ada file logo yang diupload
         if(!empty($_FILES['logo']['name'])){
-            $ekstensi = array('png','jpg','jpeg','gif');
-            $file = $_FILES['logo']['name'];
-            $x = explode('.', $file);
-            $eks = strtolower(end($x));
-            $ukuran = $_FILES['logo']['size'];
-            $file_tmp = $_FILES['logo']['tmp_name'];
+            // Validate file upload using FileValidator
+            $fileValidator = validate_file($_FILES['logo']);
+            $fileValidator->validate()
+                         ->maxSize(env_int('MAX_UPLOAD_SIZE', 1048576), 'Ukuran file terlalu besar. Maksimal 1MB.')
+                         ->allowedExtensions(['jpg', 'jpeg', 'png', 'gif'], 'Format file tidak didukung. Hanya JPG, PNG, dan GIF yang diizinkan.')
+                         ->allowedMimeTypes(['image/jpeg', 'image/png', 'image/gif'], 'Tipe file tidak valid.');
 
-            if(in_array($eks, $ekstensi) === true){
-                if($ukuran < 1044070){
-                    $query = mysqli_query($config, "SELECT logo FROM tbl_instansi");
+            if($fileValidator->passes()){
+                // Generate secure filename
+                $file_extension = strtolower(pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION));
+                $secure_filename = 'logo_' . uniqid() . '_' . time() . '.' . $file_extension;
+                $upload_path = env('UPLOAD_PATH', 'upload/') . $secure_filename;
+
+                // Create upload directory if it doesn't exist
+                $upload_dir = dirname($upload_path);
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+
+                // Move uploaded file
+                if(move_uploaded_file($_FILES['logo']['tmp_name'], $upload_path)){
+                    // Delete old logo file
+                    $query = mysqli_query($config, "SELECT logo FROM tbl_instansi WHERE id_instansi='1'");
                     $data = mysqli_fetch_array($query);
-                    $logo_lama = $data['logo'];
-                    unlink($logo_lama);
-                    move_uploaded_file($file_tmp, 'upload/'.$file);
-                    $query = mysqli_query($config, "UPDATE tbl_instansi SET nama='$nama', alamat='$alamat', kepala_dinas='$kepala_dinas', nip='$nip', website='$website', email='$email', logo='upload/$file', id_user='$id_user' WHERE id_instansi='1'");
+                    if($data && !empty($data['logo']) && file_exists($data['logo'])){
+                        unlink($data['logo']);
+                    }
+
+                    // Update database with prepared statement
+                    $stmt = mysqli_prepare($config, "UPDATE tbl_instansi SET nama=?, alamat=?, kepala_dinas=?, nip=?, website=?, email=?, logo=?, id_user=? WHERE id_instansi=1");
+                    mysqli_stmt_bind_param($stmt, "sssssssi", $nama, $alamat, $kepala_dinas, $nip, $website, $email, $upload_path, $id_user);
+                    $query = mysqli_stmt_execute($stmt);
+                    mysqli_stmt_close($stmt);
                     if($query == true){
-                        $_SESSION['succEdit'] = 'SUKSES! Data instansi berhasil diupdate';
+                        flash('succEdit', 'SUKSES! Data instansi berhasil diupdate');
 
                         // Check if headers have already been sent (when included in another page)
                         if (headers_sent()) {
@@ -52,21 +70,27 @@ if(!isset($_SESSION['admin'])){
                             die();
                         }
                     } else {
-                        $_SESSION['errQ'] = 'ERROR! Ada masalah dengan query';
+                        flash('errQ', 'ERROR! Ada masalah dengan query');
                         echo '<script language="javascript">window.history.back();</script>';
                     }
                 } else {
-                    $_SESSION['errSize'] = 'Ukuran file terlalu besar!';
+                    flash('errUpload', 'Gagal mengupload file. Silakan coba lagi.');
                     echo '<script language="javascript">window.history.back();</script>';
                 }
             } else {
-                $_SESSION['errFormat'] = 'Format file tidak didukung!';
+                $errors = $fileValidator->getErrors();
+                flash('errFormat', implode(' ', $errors));
                 echo '<script language="javascript">window.history.back();</script>';
             }
         } else {
-            $query = mysqli_query($config, "UPDATE tbl_instansi SET nama='$nama', alamat='$alamat', kepala_dinas='$kepala_dinas', nip='$nip', website='$website', email='$email', id_user='$id_user' WHERE id_instansi='1'");
+            // Update without logo using prepared statement
+            $stmt = mysqli_prepare($config, "UPDATE tbl_instansi SET nama=?, alamat=?, kepala_dinas=?, nip=?, website=?, email=?, id_user=? WHERE id_instansi=1");
+            mysqli_stmt_bind_param($stmt, "ssssssi", $nama, $alamat, $kepala_dinas, $nip, $website, $email, $id_user);
+            $query = mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+
             if($query == true){
-                $_SESSION['succEdit'] = 'SUKSES! Data instansi berhasil diupdate';
+                flash('succEdit', 'SUKSES! Data instansi berhasil diupdate');
 
                 // Check if headers have already been sent (when included in another page)
                 if (headers_sent()) {
@@ -77,7 +101,7 @@ if(!isset($_SESSION['admin'])){
                     die();
                 }
             } else {
-                $_SESSION['errQ'] = 'ERROR! Ada masalah dengan query';
+                flash('errQ', 'ERROR! Ada masalah dengan query');
                 echo '<script language="javascript">window.history.back();</script>';
             }
         }
