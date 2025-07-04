@@ -15,21 +15,29 @@ if (isset($_POST['submit'])) {
     }
 
     $username = mysqli_real_escape_string($config, $_POST['username']);
-    $password = mysqli_real_escape_string($config, md5($_POST['password']));
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Use secure password hashing
     $nama = mysqli_real_escape_string($config, $_POST['nama']);
     $nip = mysqli_real_escape_string($config, $_POST['nip']);
 
-    // Check if username exists
-    $check = mysqli_query($config, "SELECT username FROM tbl_user WHERE username='$username'");
-    if(mysqli_num_rows($check) > 0) {
+    // Check if username exists using prepared statement
+    $check_stmt = mysqli_prepare($config, "SELECT username FROM tbl_user WHERE username = ?");
+    mysqli_stmt_bind_param($check_stmt, "s", $username);
+    mysqli_stmt_execute($check_stmt);
+    $check_result = mysqli_stmt_get_result($check_stmt);
+
+    if(mysqli_num_rows($check_result) > 0) {
         $_SESSION['err'] = 'Username sudah terdaftar!';
+        mysqli_stmt_close($check_stmt);
         header("Location: register.php");
         exit();
     }
+    mysqli_stmt_close($check_stmt);
 
-    // Insert new user (default admin=0 for regular user)
-    $query = mysqli_query($config, "INSERT INTO tbl_user (username, password, nama, nip, admin) 
-              VALUES ('$username', '$password', '$nama', '$nip', 0)");
+    // Insert new user using prepared statement (default admin=0 for regular user)
+    $insert_stmt = mysqli_prepare($config, "INSERT INTO tbl_user (username, password, nama, nip, admin) VALUES (?, ?, ?, ?, 0)");
+    mysqli_stmt_bind_param($insert_stmt, "ssss", $username, $password, $nama, $nip);
+    $query = mysqli_stmt_execute($insert_stmt);
+    mysqli_stmt_close($insert_stmt);
 
     if($query) {
         $_SESSION['success'] = 'Registrasi berhasil! Silakan login.';

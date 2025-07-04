@@ -11,27 +11,56 @@ if (isset($_SESSION['admin'])) {
 
 if (isset($_POST['submit'])) {
     $username = mysqli_real_escape_string($config, $_POST['username']);
-    $password = mysqli_real_escape_string($config, md5($_POST['password']));
-    
-    $query = mysqli_query($config, "SELECT * FROM tbl_user WHERE username='$username' AND password='$password'");
-    
-    if (mysqli_num_rows($query) > 0) {
-        $data = mysqli_fetch_array($query);
-        $_SESSION['admin'] = $data['admin'];
-        $_SESSION['id_user'] = $data['id_user'];
-        $_SESSION['nama'] = $data['nama'];
-        
-        if ($data['admin'] == 1) {
-            header("Location: admin.php");
+    $password = $_POST['password']; // Don't escape password, we'll hash it
+
+    // Use prepared statement to prevent SQL injection
+    $stmt = mysqli_prepare($config, "SELECT id_user, username, password, nama, admin FROM tbl_user WHERE username = ?");
+    mysqli_stmt_bind_param($stmt, "s", $username);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $data = mysqli_fetch_array($result);
+
+        // Verify password using password_verify for new hashes or fallback to MD5 for old hashes
+        $password_valid = false;
+        if (strlen($data['password']) === 32) {
+            // Old MD5 hash - verify and update to new hash
+            if (md5($password) === $data['password']) {
+                $password_valid = true;
+                // Update to new password hash
+                $new_hash = password_hash($password, PASSWORD_DEFAULT);
+                $update_stmt = mysqli_prepare($config, "UPDATE tbl_user SET password = ? WHERE id_user = ?");
+                mysqli_stmt_bind_param($update_stmt, "si", $new_hash, $data['id_user']);
+                mysqli_stmt_execute($update_stmt);
+                mysqli_stmt_close($update_stmt);
+            }
         } else {
-            header("Location: halaman_user.php");
+            // New password hash
+            $password_valid = password_verify($password, $data['password']);
         }
-        exit();
-    } else {
-        $_SESSION['err'] = 'Username atau Password salah!';
-        header("Location: index.php");
-        exit();
+
+        if ($password_valid) {
+            // Regenerate session ID for security
+            session_regenerate_id(true);
+
+            $_SESSION['admin'] = $data['admin'];
+            $_SESSION['id_user'] = $data['id_user'];
+            $_SESSION['nama'] = $data['nama'];
+            $_SESSION['login_time'] = time(); // Add login timestamp
+
+            if ($data['admin'] == 1) {
+                header("Location: admin.php");
+            } else {
+                header("Location: halaman_user.php");
+            }
+            exit();
+        }
     }
+
+    $_SESSION['err'] = 'Username atau Password salah!';
+    header("Location: index.php");
+    exit();
 }
 
 include 'include/head.php';

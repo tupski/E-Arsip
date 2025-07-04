@@ -71,16 +71,24 @@ INSERT INTO `tbl_instansi` (`id_instansi`, `nama`, `alamat`, `kepala_dinas`, `ni
 
 -- Buat tabel user dengan AUTO_INCREMENT
 CREATE TABLE `tbl_user` (
-  `id_user` tinyint(2) NOT NULL AUTO_INCREMENT,
-  `username` varchar(30) NOT NULL,
-  `password` varchar(35) NOT NULL,
-  `nama` varchar(50) NOT NULL,
+  `id_user` int(10) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL UNIQUE,
+  `password` varchar(255) NOT NULL,
+  `nama` varchar(100) NOT NULL,
   `nip` varchar(25) NOT NULL,
-  `admin` tinyint(1) NOT NULL,
-  PRIMARY KEY (`id_user`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `admin` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_user`),
+  INDEX `idx_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insert data user
+-- Insert data user with secure password hashing
+-- Default passwords: admin = 'admin123', user = 'user123'
+-- These should be changed immediately after installation
 INSERT INTO `tbl_user` (`id_user`, `username`, `password`, `nama`, `nip`, `admin`) VALUES
-(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator', '12345678901234567890', 1),
-(2, 'user', 'ee11cbb19052e40b07aac0ca060c23ee', 'User Biasa', '09876543210987654321', 0);
+(1, 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrator', '12345678901234567890', 1),
+(2, 'user', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'User Biasa', '09876543210987654321', 0);
+
+-- Note: Default password for both users is 'password'
+-- Please change these passwords immediately after installation for security

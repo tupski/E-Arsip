@@ -16,22 +16,29 @@ if(!isset($_SESSION['admin'])){
         } else {
 
             $username = mysqli_real_escape_string($config, $_REQUEST['username']);
-            $password = mysqli_real_escape_string($config, md5($_REQUEST['password']));
+            $password = password_hash($_REQUEST['password'], PASSWORD_DEFAULT); // Use secure password hashing
             $nama = mysqli_real_escape_string($config, $_REQUEST['nama']);
             $nip = mysqli_real_escape_string($config, $_REQUEST['nip']);
             $admin = mysqli_real_escape_string($config, $_REQUEST['admin']);
 
-            //validasi input username
-            $sql = "SELECT * FROM tbl_user WHERE username='$username'";
-            $query = mysqli_query($config, $sql);
-            if(mysqli_num_rows($query) > 0){
+            //validasi input username using prepared statement
+            $check_stmt = mysqli_prepare($config, "SELECT username FROM tbl_user WHERE username = ?");
+            mysqli_stmt_bind_param($check_stmt, "s", $username);
+            mysqli_stmt_execute($check_stmt);
+            $check_result = mysqli_stmt_get_result($check_stmt);
+
+            if(mysqli_num_rows($check_result) > 0){
                 $_SESSION['errUser'] = 'Username sudah terdaftar!';
+                mysqli_stmt_close($check_stmt);
                 echo '<script>window.history.back();</script>';
                 die();
             } else {
+                mysqli_stmt_close($check_stmt);
 
-                $query = mysqli_query($config, "INSERT INTO tbl_user(username, password, nama, nip, admin) 
-                VALUES('$username', '$password', '$nama', '$nip', '$admin')");
+                $insert_stmt = mysqli_prepare($config, "INSERT INTO tbl_user(username, password, nama, nip, admin) VALUES(?, ?, ?, ?, ?)");
+                mysqli_stmt_bind_param($insert_stmt, "ssssi", $username, $password, $nama, $nip, $admin);
+                $query = mysqli_stmt_execute($insert_stmt);
+                mysqli_stmt_close($insert_stmt);
 
                 if($query == true){
                     $_SESSION['succAdd'] = 'SUKSES! Data user berhasil ditambahkan';
