@@ -45,6 +45,12 @@ require_once __DIR__ . '/file_handler.php';
 // Load error handler
 require_once __DIR__ . '/error_handler.php';
 
+// Load autoloader
+require_once __DIR__ . '/autoloader.php';
+
+// Load view helpers
+require_once __DIR__ . '/view_helpers.php';
+
 // Cek apakah fungsi sudah didefinisikan
 if (!function_exists('isLoggedIn')) {
     // Fungsi untuk memeriksa login
