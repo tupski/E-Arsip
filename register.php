@@ -7,6 +7,13 @@ if (isset($_SESSION['admin'])) {
 }
 
 if (isset($_POST['submit'])) {
+    // Validate CSRF token
+    if (!csrf_validate('register')) {
+        $_SESSION['err'] = 'Token keamanan tidak valid. Silakan coba lagi.';
+        header("Location: register.php");
+        exit();
+    }
+
     // Validate empty fields
     if(empty($_POST['username']) || empty($_POST['password']) || empty($_POST['nama']) || empty($_POST['nip'])) {
         $_SESSION['err'] = 'Semua field harus diisi!';
@@ -103,6 +110,7 @@ include 'include/head.php';
             <?php endif; ?>
             
             <form method="post" action="">
+                <?php echo csrf_field('register'); ?>
                  <div class="input-field">
                     <i class="material-icons prefix">account_circle</i>
                     <input id="nama" type="text" name="nama" required>

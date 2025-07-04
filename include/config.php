@@ -62,6 +62,9 @@ mysqli_set_charset($config, 'utf8mb4');
 $timezone = env('APP_TIMEZONE', 'Asia/Jakarta');
 date_default_timezone_set($timezone);
 
+// Load CSRF protection
+require_once __DIR__ . '/csrf.php';
+
 // Cek apakah fungsi sudah didefinisikan
 if (!function_exists('isLoggedIn')) {
     // Fungsi untuk memeriksa login

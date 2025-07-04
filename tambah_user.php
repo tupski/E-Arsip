@@ -7,6 +7,12 @@ if(!isset($_SESSION['admin'])){
 } else {
 
     if(isset($_REQUEST['submit'])){
+        // Validate CSRF token
+        if (!csrf_validate('tambah_user')) {
+            $_SESSION['errEmpty'] = 'Token keamanan tidak valid. Silakan coba lagi.';
+            echo '<script>window.history.back();</script>';
+            die();
+        }
 
         //validasi form kosong
         if($_REQUEST['username'] == "" || $_REQUEST['password'] == "" || $_REQUEST['nama'] == "" || $_REQUEST['nip'] == ""){
@@ -275,6 +281,7 @@ if(!isset($_SESSION['admin'])){
                     ?>
                     
                     <form method="post" action="?page=usr&act=add">
+                        <?php echo csrf_field('tambah_user'); ?>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="username"><i class="material-icons icon-prefix">account_circle</i> Username</label>

@@ -10,6 +10,13 @@ if (isset($_SESSION['admin'])) {
 }
 
 if (isset($_POST['submit'])) {
+    // Validate CSRF token
+    if (!csrf_validate('login')) {
+        $_SESSION['err'] = 'Token keamanan tidak valid. Silakan coba lagi.';
+        header("Location: index.php");
+        exit();
+    }
+
     $username = mysqli_real_escape_string($config, $_POST['username']);
     $password = $_POST['password']; // Don't escape password, we'll hash it
 
@@ -157,6 +164,7 @@ include 'include/head.php';
             <?php endif; ?>
 
             <form method="post" action="">
+                <?php echo csrf_field('login'); ?>
                 <div class="input-field">
                     <i class="material-icons prefix blue-text">person</i>
                     <input id="username" type="text" class="validate" name="username" required>
