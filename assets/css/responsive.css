@@ -1,0 +1,461 @@
+/**
+ * Responsive Design Improvements for E-Arsip
+ * Mobile-first responsive design with enhanced UX
+ */
+
+/* Base responsive styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container improvements */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Navigation improvements */
+.navbar-fixed nav {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.nav-wrapper {
+    padding: 0 15px;
+}
+
+.brand-logo {
+    font-size: 1.8rem !important;
+    font-weight: 500;
+}
+
+/* Sidebar improvements */
+.side-nav {
+    width: 280px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.side-nav li > a {
+    color: rgba(255,255,255,0.9);
+    font-weight: 400;
+    padding: 15px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+}
+
+.side-nav li > a:hover {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.side-nav li.active > a {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    font-weight: 500;
+}
+
+/* Card improvements */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.card-title {
+    font-weight: 500;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.card-content {
+    padding: 24px;
+}
+
+.card-action {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(160,160,160,0.2);
+}
+
+/* Button improvements */
+.btn, .btn-large, .btn-small {
+    border-radius: 25px;
+    text-transform: none;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.btn:hover, .btn-large:hover, .btn-small:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+}
+
+.btn-floating {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn-floating:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+}
+
+/* Form improvements */
+.input-field {
+    margin-bottom: 25px;
+}
+
+.input-field input[type=text]:focus + label,
+.input-field input[type=password]:focus + label,
+.input-field input[type=email]:focus + label,
+.input-field textarea:focus + label {
+    color: #667eea;
+}
+
+.input-field input[type=text]:focus,
+.input-field input[type=password]:focus,
+.input-field input[type=email]:focus,
+.input-field textarea:focus {
+    border-bottom: 1px solid #667eea;
+    box-shadow: 0 1px 0 0 #667eea;
+}
+
+/* Table improvements */
+.responsive-table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+table.striped > tbody > tr:nth-child(odd) {
+    background-color: rgba(242, 242, 242, 0.5);
+}
+
+table.highlight > tbody > tr:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+}
+
+th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 500;
+    padding: 15px 12px;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(160,160,160,0.2);
+}
+
+/* Alert/notification improvements */
+.card-panel {
+    border-radius: 8px;
+    border-left: 4px solid;
+    margin: 20px 0;
+    padding: 20px;
+}
+
+.card-panel.green {
+    border-left-color: #4caf50;
+}
+
+.card-panel.red {
+    border-left-color: #f44336;
+}
+
+.card-panel.orange {
+    border-left-color: #ff9800;
+}
+
+.card-panel.blue {
+    border-left-color: #2196f3;
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Responsive breakpoints */
+
+/* Mobile First - Base styles above are for mobile */
+
+/* Small tablets and large phones (landscape) */
+@media only screen and (min-width: 600px) {
+    .container {
+        padding: 0 20px;
+    }
+    
+    .card-content {
+        padding: 30px;
+    }
+    
+    .brand-logo {
+        font-size: 2rem !important;
+    }
+}
+
+/* Tablets */
+@media only screen and (min-width: 768px) {
+    .container {
+        padding: 0 30px;
+    }
+    
+    /* Grid improvements for tablets */
+    .col.s12.m6 {
+        width: 50%;
+        margin-left: auto;
+        left: auto;
+        right: auto;
+    }
+    
+    /* Table responsive improvements */
+    .responsive-table table {
+        font-size: 0.9rem;
+    }
+}
+
+/* Small desktops */
+@media only screen and (min-width: 992px) {
+    .container {
+        padding: 0 40px;
+    }
+    
+    /* Sidebar improvements for desktop */
+    .side-nav.fixed {
+        transform: translateX(0);
+    }
+    
+    main {
+        padding-left: 300px;
+    }
+    
+    .navbar-fixed nav .nav-wrapper {
+        padding-left: 320px;
+    }
+}
+
+/* Large desktops */
+@media only screen and (min-width: 1200px) {
+    .container {
+        max-width: 1200px;
+        padding: 0 50px;
+    }
+    
+    .card-content {
+        padding: 40px;
+    }
+}
+
+/* Mobile specific improvements */
+@media only screen and (max-width: 600px) {
+    /* Hide desktop elements on mobile */
+    .hide-on-small-only {
+        display: none !important;
+    }
+    
+    /* Mobile navigation */
+    .nav-wrapper .brand-logo {
+        font-size: 1.5rem !important;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    /* Mobile cards */
+    .card {
+        margin: 10px 0;
+        border-radius: 0;
+    }
+    
+    .card-content {
+        padding: 20px 15px;
+    }
+    
+    /* Mobile tables */
+    .responsive-table {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .responsive-table table {
+        min-width: 600px;
+        font-size: 0.8rem;
+    }
+    
+    /* Mobile forms */
+    .input-field {
+        margin-bottom: 20px;
+    }
+    
+    /* Mobile buttons */
+    .btn, .btn-large {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .btn-floating {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    /* Mobile pagination */
+    .pagination li {
+        display: inline-block;
+        font-size: 0.8rem;
+    }
+    
+    .pagination li a {
+        padding: 0 8px;
+    }
+}
+
+/* Touch device improvements */
+@media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets */
+    .btn, .btn-large, .btn-small {
+        min-height: 44px;
+        padding: 0 20px;
+    }
+    
+    .side-nav li > a {
+        padding: 20px 32px;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .card:hover {
+        transform: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .btn:hover, .btn-large:hover, .btn-small:hover {
+        transform: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+}
+
+/* Print styles */
+@media print {
+    .side-nav,
+    .navbar-fixed,
+    .btn,
+    .btn-floating,
+    .card-action {
+        display: none !important;
+    }
+    
+    main {
+        padding-left: 0 !important;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.4;
+    }
+    
+    .card-title {
+        font-size: 14pt;
+        font-weight: bold;
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .card {
+        border: 2px solid #000;
+    }
+    
+    .btn {
+        border: 2px solid #000;
+    }
+    
+    th {
+        border: 2px solid #000;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #ffffff;
+    }
+    
+    .card {
+        background-color: #1e1e1e;
+        color: #ffffff;
+    }
+    
+    .nav-wrapper {
+        background-color: #1e1e1e;
+    }
+    
+    .side-nav {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    }
+    
+    table.striped > tbody > tr:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    th {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    }
+    
+    .input-field input[type=text],
+    .input-field input[type=password],
+    .input-field input[type=email],
+    .input-field textarea {
+        color: #ffffff;
+        border-bottom: 1px solid #666;
+    }
+    
+    .input-field label {
+        color: #ccc;
+    }
+}

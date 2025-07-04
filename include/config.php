@@ -51,6 +51,15 @@ require_once __DIR__ . '/autoloader.php';
 // Load view helpers
 require_once __DIR__ . '/view_helpers.php';
 
+// Load database monitor
+require_once __DIR__ . '/database_monitor.php';
+
+// Load cache manager
+require_once __DIR__ . '/cache_manager.php';
+
+// Load session cache
+require_once __DIR__ . '/session_cache.php';
+
 // Cek apakah fungsi sudah didefinisikan
 if (!function_exists('isLoggedIn')) {
     // Fungsi untuk memeriksa login
