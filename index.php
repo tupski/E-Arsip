@@ -65,6 +65,13 @@ if (isset($_POST['submit'])) {
         }
 
         if ($password_valid) {
+            // Log successful login
+            log_activity('login', 'User logged in successfully', [
+                'username' => $username,
+                'user_id' => $data['id_user'],
+                'admin_level' => $data['admin']
+            ]);
+
             // Start secure user session
             SessionManager::startUserSession($data);
 
@@ -76,6 +83,12 @@ if (isset($_POST['submit'])) {
             exit();
         }
     }
+
+    // Log failed login attempt
+    log_security('failed_login', 'Failed login attempt', [
+        'username' => $username,
+        'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+    ]);
 
     $_SESSION['err'] = 'Username atau Password salah!';
     header("Location: index.php");
