@@ -1,26 +1,66 @@
 <?php
 // Pastikan tidak ada output sebelum tag php pembuka
 
+// Load environment variables
+require_once __DIR__ . '/env.php';
+
+// Configure session settings
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+ini_set('session.use_strict_mode', 1);
+ini_set('session.cookie_samesite', 'Strict');
+
+// Set session name and lifetime
+$session_name = env('SESSION_NAME', 'EARSIP_SESSION');
+$session_lifetime = env_int('SESSION_LIFETIME', 3600);
+
+session_name($session_name);
+session_set_cookie_params([
+    'lifetime' => $session_lifetime,
+    'path' => '/',
+    'domain' => '',
+    'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+    'httponly' => true,
+    'samesite' => 'Strict'
+]);
+
 // Mulai session hanya jika belum dimulai
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-$host     = "localhost";
-$username = "root";
-$password = "masrud.com";
-$database = "e_arsip";
+// Check session timeout
+if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time']) > $session_lifetime) {
+    session_destroy();
+    header("Location: index.php?timeout=1");
+    exit();
+}
 
-// Buat koneksi
+// Database configuration from environment variables
+$host     = env('DB_HOST', 'localhost');
+$username = env('DB_USERNAME', 'root');
+$password = env('DB_PASSWORD', '');
+$database = env('DB_NAME', 'e_arsip');
+
+// Buat koneksi dengan error handling yang lebih baik
 $config = mysqli_connect($host, $username, $password, $database);
 
 // Cek koneksi
 if (!$config) {
-    die("Koneksi database gagal: " . mysqli_connect_error());
+    error_log("Database connection failed: " . mysqli_connect_error());
+    if (env_bool('APP_DEBUG', false)) {
+        die("Koneksi database gagal: " . mysqli_connect_error());
+    } else {
+        die("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
+    }
 }
 
+// Set charset to UTF-8 for better security and internationalization
+mysqli_set_charset($config, 'utf8mb4');
+
 // Set timezone
-date_default_timezone_set('Asia/Jakarta');
+$timezone = env('APP_TIMEZONE', 'Asia/Jakarta');
+date_default_timezone_set($timezone);
 
 // Cek apakah fungsi sudah didefinisikan
 if (!function_exists('isLoggedIn')) {
