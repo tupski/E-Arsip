@@ -1,7 +1,9 @@
 <?php
 include 'include/config.php';
-if (isset($_SESSION['admin'])) {
-    if ($_SESSION['admin'] == 1) {
+
+// Check if user is already logged in
+if (is_logged_in()) {
+    if (is_admin()) {
         header("Location: admin.php");
     } else {
         header("Location: halaman_user.php");
@@ -63,15 +65,10 @@ if (isset($_POST['submit'])) {
         }
 
         if ($password_valid) {
-            // Regenerate session ID for security
-            session_regenerate_id(true);
+            // Start secure user session
+            SessionManager::startUserSession($data);
 
-            $_SESSION['admin'] = $data['admin'];
-            $_SESSION['id_user'] = $data['id_user'];
-            $_SESSION['nama'] = $data['nama'];
-            $_SESSION['login_time'] = time(); // Add login timestamp
-
-            if ($data['admin'] == 1) {
+            if ($data['admin'] == 1 || $data['admin'] == 2) {
                 header("Location: admin.php");
             } else {
                 header("Location: halaman_user.php");

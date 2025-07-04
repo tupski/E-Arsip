@@ -1,6 +1,6 @@
 <?php
-require 'include/config.php';
-session_destroy();
-header("Location: index.php");
-exit();
+require_once 'include/config.php';
+
+// Use secure session logout
+SessionManager::logout();
 ?>

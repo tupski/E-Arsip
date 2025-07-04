@@ -1,7 +1,7 @@
 <?php
 function cek_session_admin(){
-    if(!isset($_SESSION['admin']) || ($_SESSION['admin'] != 1 && $_SESSION['admin'] != 2)){
-        $_SESSION['err'] = '<center>Anda tidak memiliki hak akses!</center>';
+    if(!is_admin()){
+        flash('err', '<center>Anda tidak memiliki hak akses!</center>');
 
         // Check if headers have already been sent (when included in another page)
         if (headers_sent()) {
@@ -15,8 +15,8 @@ function cek_session_admin(){
 }
 
 function cek_session_user(){
-    if(!isset($_SESSION['admin']) || $_SESSION['admin'] != 0){
-        $_SESSION['err'] = '<center>Anda tidak memiliki hak akses!</center>';
+    if(!is_logged_in() || !SessionManager::isRegularUser()){
+        flash('err', '<center>Anda tidak memiliki hak akses!</center>');
 
         // Check if headers have already been sent (when included in another page)
         if (headers_sent()) {

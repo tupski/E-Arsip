@@ -4,37 +4,8 @@
 // Load environment variables
 require_once __DIR__ . '/env.php';
 
-// Configure session settings
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
-ini_set('session.use_strict_mode', 1);
-ini_set('session.cookie_samesite', 'Strict');
-
-// Set session name and lifetime
-$session_name = env('SESSION_NAME', 'EARSIP_SESSION');
-$session_lifetime = env_int('SESSION_LIFETIME', 3600);
-
-session_name($session_name);
-session_set_cookie_params([
-    'lifetime' => $session_lifetime,
-    'path' => '/',
-    'domain' => '',
-    'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-
-// Mulai session hanya jika belum dimulai
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Check session timeout
-if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time']) > $session_lifetime) {
-    session_destroy();
-    header("Location: index.php?timeout=1");
-    exit();
-}
+// Load session management
+require_once __DIR__ . '/session.php';
 
 // Database configuration from environment variables
 $host     = env('DB_HOST', 'localhost');
