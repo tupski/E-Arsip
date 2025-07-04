@@ -17,8 +17,23 @@ if (isset($_POST['submit'])) {
         exit();
     }
 
-    $username = mysqli_real_escape_string($config, $_POST['username']);
-    $password = $_POST['password']; // Don't escape password, we'll hash it
+    // Validate input
+    $validator = validate($_POST);
+    $validator->required('username', 'Username wajib diisi.')
+             ->minLength('username', 3, 'Username minimal 3 karakter.')
+             ->username('username', 'Format username tidak valid.')
+             ->required('password', 'Password wajib diisi.')
+             ->minLength('password', 6, 'Password minimal 6 karakter.');
+
+    if ($validator->fails()) {
+        $_SESSION['err'] = $validator->getFirstError();
+        header("Location: index.php");
+        exit();
+    }
+
+    $sanitized = $validator->getSanitizedData();
+    $username = $sanitized['username'];
+    $password = $_POST['password']; // Don't sanitize password, we'll hash it
 
     // Use prepared statement to prevent SQL injection
     $stmt = mysqli_prepare($config, "SELECT id_user, username, password, nama, admin FROM tbl_user WHERE username = ?");

@@ -65,6 +65,9 @@ date_default_timezone_set($timezone);
 // Load CSRF protection
 require_once __DIR__ . '/csrf.php';
 
+// Load input validation
+require_once __DIR__ . '/validation.php';
+
 // Cek apakah fungsi sudah didefinisikan
 if (!function_exists('isLoggedIn')) {
     // Fungsi untuk memeriksa login

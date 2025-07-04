@@ -14,17 +14,30 @@ if (isset($_POST['submit'])) {
         exit();
     }
 
-    // Validate empty fields
-    if(empty($_POST['username']) || empty($_POST['password']) || empty($_POST['nama']) || empty($_POST['nip'])) {
-        $_SESSION['err'] = 'Semua field harus diisi!';
+    // Validate input
+    $validator = validate($_POST);
+    $validator->required('username', 'Username wajib diisi.')
+             ->minLength('username', 3, 'Username minimal 3 karakter.')
+             ->maxLength('username', 30, 'Username maksimal 30 karakter.')
+             ->username('username', 'Username hanya boleh berisi huruf, angka, dan underscore.')
+             ->required('password', 'Password wajib diisi.')
+             ->minLength('password', env_int('PASSWORD_MIN_LENGTH', 8), 'Password minimal 8 karakter.')
+             ->required('nama', 'Nama lengkap wajib diisi.')
+             ->maxLength('nama', 100, 'Nama maksimal 100 karakter.')
+             ->required('nip', 'NIP wajib diisi.')
+             ->nip('nip', 'Format NIP tidak valid (harus 18 digit angka).');
+
+    if ($validator->fails()) {
+        $_SESSION['err'] = $validator->getFirstError();
         header("Location: register.php");
         exit();
     }
 
-    $username = mysqli_real_escape_string($config, $_POST['username']);
+    $sanitized = $validator->getSanitizedData();
+    $username = $sanitized['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Use secure password hashing
-    $nama = mysqli_real_escape_string($config, $_POST['nama']);
-    $nip = mysqli_real_escape_string($config, $_POST['nip']);
+    $nama = $sanitized['nama'];
+    $nip = $sanitized['nip'];
 
     // Check if username exists using prepared statement
     $check_stmt = mysqli_prepare($config, "SELECT username FROM tbl_user WHERE username = ?");

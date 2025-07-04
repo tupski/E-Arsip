@@ -14,49 +14,64 @@ if(!isset($_SESSION['admin'])){
             die();
         }
 
-        //validasi form kosong
-        if($_REQUEST['username'] == "" || $_REQUEST['password'] == "" || $_REQUEST['nama'] == "" || $_REQUEST['nip'] == ""){
-            $_SESSION['errEmpty'] = 'ERROR! Semua form wajib diisi';
+        // Validate input
+        $validator = validate($_REQUEST);
+        $validator->required('username', 'Username wajib diisi.')
+                 ->minLength('username', 3, 'Username minimal 3 karakter.')
+                 ->maxLength('username', 30, 'Username maksimal 30 karakter.')
+                 ->username('username', 'Username hanya boleh berisi huruf, angka, dan underscore.')
+                 ->required('password', 'Password wajib diisi.')
+                 ->minLength('password', env_int('PASSWORD_MIN_LENGTH', 8), 'Password minimal 8 karakter.')
+                 ->required('nama', 'Nama lengkap wajib diisi.')
+                 ->maxLength('nama', 100, 'Nama maksimal 100 karakter.')
+                 ->required('nip', 'NIP wajib diisi.')
+                 ->nip('nip', 'Format NIP tidak valid (harus 18 digit angka).')
+                 ->required('admin', 'Level admin wajib dipilih.')
+                 ->integer('admin', 'Level admin harus berupa angka.');
+
+        if ($validator->fails()) {
+            $_SESSION['errEmpty'] = $validator->getFirstError();
+            echo '<script>window.history.back();</script>';
+            die();
+        }
+
+        $sanitized = $validator->getSanitizedData();
+        $username = $sanitized['username'];
+        $password = password_hash($_REQUEST['password'], PASSWORD_DEFAULT); // Use secure password hashing
+        $nama = $sanitized['nama'];
+        $nip = $sanitized['nip'];
+        $admin = (int)$sanitized['admin'];
+
+        //validasi input username using prepared statement
+        $check_stmt = mysqli_prepare($config, "SELECT username FROM tbl_user WHERE username = ?");
+        mysqli_stmt_bind_param($check_stmt, "s", $username);
+        mysqli_stmt_execute($check_stmt);
+        $check_result = mysqli_stmt_get_result($check_stmt);
+
+        if(mysqli_num_rows($check_result) > 0){
+            $_SESSION['errUser'] = 'Username sudah terdaftar!';
+            mysqli_stmt_close($check_stmt);
             echo '<script>window.history.back();</script>';
             die();
         } else {
+            mysqli_stmt_close($check_stmt);
 
-            $username = mysqli_real_escape_string($config, $_REQUEST['username']);
-            $password = password_hash($_REQUEST['password'], PASSWORD_DEFAULT); // Use secure password hashing
-            $nama = mysqli_real_escape_string($config, $_REQUEST['nama']);
-            $nip = mysqli_real_escape_string($config, $_REQUEST['nip']);
-            $admin = mysqli_real_escape_string($config, $_REQUEST['admin']);
+            $insert_stmt = mysqli_prepare($config, "INSERT INTO tbl_user(username, password, nama, nip, admin) VALUES(?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($insert_stmt, "ssssi", $username, $password, $nama, $nip, $admin);
+            $query = mysqli_stmt_execute($insert_stmt);
+            mysqli_stmt_close($insert_stmt);
 
-            //validasi input username using prepared statement
-            $check_stmt = mysqli_prepare($config, "SELECT username FROM tbl_user WHERE username = ?");
-            mysqli_stmt_bind_param($check_stmt, "s", $username);
-            mysqli_stmt_execute($check_stmt);
-            $check_result = mysqli_stmt_get_result($check_stmt);
-
-            if(mysqli_num_rows($check_result) > 0){
-                $_SESSION['errUser'] = 'Username sudah terdaftar!';
-                mysqli_stmt_close($check_stmt);
-                echo '<script>window.history.back();</script>';
+            if($query == true){
+                $_SESSION['succAdd'] = 'SUKSES! Data user berhasil ditambahkan';
+                echo '<script>window.location.href="./admin.php?page=usr";</script>';
                 die();
             } else {
-                mysqli_stmt_close($check_stmt);
-
-                $insert_stmt = mysqli_prepare($config, "INSERT INTO tbl_user(username, password, nama, nip, admin) VALUES(?, ?, ?, ?, ?)");
-                mysqli_stmt_bind_param($insert_stmt, "ssssi", $username, $password, $nama, $nip, $admin);
-                $query = mysqli_stmt_execute($insert_stmt);
-                mysqli_stmt_close($insert_stmt);
-
-                if($query == true){
-                    $_SESSION['succAdd'] = 'SUKSES! Data user berhasil ditambahkan';
-                    echo '<script>window.location.href="./admin.php?page=usr";</script>';
-                    die();
-                } else {
-                    $_SESSION['errQ'] = 'ERROR! Ada masalah dengan query';
-                    echo '<script>window.history.back();</script>';
-                    die();
-                }
+                $_SESSION['errQ'] = 'ERROR! Ada masalah dengan query';
+                echo '<script>window.history.back();</script>';
+                die();
             }
         }
+    }
     } else {
 ?>
 
