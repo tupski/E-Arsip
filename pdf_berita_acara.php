@@ -1,18 +1,38 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
+// Start session manually for PDF generation
+if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-require_once 'include/config.php';
-require_once 'include/tcpdf/tcpdf.php';
 
-if (!isset($_SESSION['admin'])) {
-    die('Akses ditolak');
+// Simple authentication check without SessionManager
+if (!isset($_SESSION['admin']) || !isset($_SESSION['id_user'])) {
+    http_response_code(403);
+    die('Akses ditolak - Silakan login terlebih dahulu');
 }
+
+// Load database config only
+$host = 'localhost';
+$username = 'root';
+$password = 'mysql';
+$database = 'earsip_db';
+
+$config = mysqli_connect($host, $username, $password, $database);
+if (!$config) {
+    die("Koneksi database gagal: " . mysqli_connect_error());
+}
+mysqli_set_charset($config, 'utf8mb4');
+
+require_once 'include/TCPDF/tcpdf.php';
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    http_response_code(400);
     die('ID tidak valid');
 }
 
-ob_clean();
+// Clean output buffer
+if (ob_get_level()) {
+    ob_end_clean();
+}
+
 $id = mysqli_real_escape_string($config, $_GET['id']);
 
 if ($_SESSION['admin'] == 1 || $_SESSION['admin'] == 2) {
@@ -23,7 +43,8 @@ if ($_SESSION['admin'] == 1 || $_SESSION['admin'] == 2) {
 }
 
 if (!$query || mysqli_num_rows($query) == 0) {
-    die('Data tidak ditemukan');
+    http_response_code(404);
+    die('Data tidak ditemukan atau Anda tidak memiliki akses');
 }
 $data = mysqli_fetch_array($query);
 

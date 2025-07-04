@@ -1,14 +1,8 @@
 <?php
-// Mulai session
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
 include 'include/config.php';
-include 'include/head.php';
 
-// Cek apakah user sudah login
-if (!isset($_SESSION['admin'])) {
+// Cek apakah user sudah login menggunakan SessionManager
+if (!is_logged_in()) {
     $_SESSION['err'] = '<center>Anda harus login terlebih dahulu!</center>';
     header("Location: index.php");
     exit();
@@ -18,6 +12,8 @@ if (!isset($_SESSION['admin'])) {
 $id_user = $_SESSION['id_user'];
 $query = mysqli_query($config, "SELECT * FROM tbl_user WHERE id_user='$id_user'");
 $user_data = mysqli_fetch_array($query);
+
+include 'include/head.php';
 ?>
 <!DOCTYPE html>
 <html lang="id">

@@ -132,8 +132,9 @@ include 'include/head.php';
                 
                 <div class="input-field">
                     <i class="material-icons prefix">credit_card</i>
-                    <input id="nip" type="text" name="nip" required>
-                    <label for="nip">NIP</label>
+                    <input id="nip" type="text" name="nip" maxlength="18" pattern="[0-9]{18}" title="NIP harus berupa 18 digit angka" required>
+                    <label for="nip">NIP (18 digit)</label>
+                    <span class="helper-text" id="nip-helper">Masukkan 18 digit angka</span>
                 </div>
                 <div class="input-field">
                     <i class="material-icons prefix">person</i>
@@ -158,5 +159,59 @@ include 'include/head.php';
         </div>
     </div>
 </div>
+
+<script>
+// Validasi NIP - hanya angka dan maksimal 18 digit
+document.getElementById('nip').addEventListener('input', function(e) {
+    const nipHelper = document.getElementById('nip-helper');
+
+    // Hapus karakter non-angka
+    this.value = this.value.replace(/[^0-9]/g, '');
+
+    // Batasi maksimal 18 digit
+    if (this.value.length > 18) {
+        this.value = this.value.slice(0, 18);
+    }
+
+    // Update helper text dengan feedback
+    const length = this.value.length;
+    if (length === 0) {
+        nipHelper.textContent = 'Masukkan 18 digit angka';
+        nipHelper.style.color = '#9e9e9e';
+    } else if (length < 18) {
+        nipHelper.textContent = `${length}/18 digit (kurang ${18 - length} digit)`;
+        nipHelper.style.color = '#ff9800';
+    } else if (length === 18) {
+        nipHelper.textContent = '✓ NIP valid (18 digit)';
+        nipHelper.style.color = '#4caf50';
+    }
+});
+
+// Validasi form sebelum submit
+document.querySelector('form').addEventListener('submit', function(e) {
+    const nip = document.getElementById('nip').value;
+
+    if (nip.length !== 18) {
+        e.preventDefault();
+        alert('NIP harus berupa 18 digit angka!');
+        document.getElementById('nip').focus();
+        return false;
+    }
+
+    if (!/^[0-9]{18}$/.test(nip)) {
+        e.preventDefault();
+        alert('NIP hanya boleh berisi angka!');
+        document.getElementById('nip').focus();
+        return false;
+    }
+});
+
+// Auto-focus ke field berikutnya setelah NIP lengkap
+document.getElementById('nip').addEventListener('input', function(e) {
+    if (this.value.length === 18) {
+        document.getElementById('username').focus();
+    }
+});
+</script>
 
 <?php include 'include/footer.php'; ?>

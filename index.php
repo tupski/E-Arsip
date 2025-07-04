@@ -188,6 +188,13 @@ include 'include/head.php';
                 </div>
             <?php endif; ?>
 
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="success-message card-panel green lighten-4 green-text text-darken-4">
+                    <i class="material-icons left">check_circle</i>
+                    <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                </div>
+            <?php endif; ?>
+
             <form method="post" action="">
                 <?php echo csrf_field('login'); ?>
                 <div class="input-field">

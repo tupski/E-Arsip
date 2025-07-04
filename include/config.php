@@ -10,8 +10,8 @@ require_once __DIR__ . '/session.php';
 // Database configuration from environment variables
 $host     = env('DB_HOST', 'localhost');
 $username = env('DB_USERNAME', 'root');
-$password = env('DB_PASSWORD', '');
-$database = env('DB_NAME', 'e_arsip');
+$password = env('DB_PASSWORD', 'mysql');
+$database = env('DB_NAME', 'earsip_db');
 
 // Buat koneksi dengan error handling yang lebih baik
 $config = mysqli_connect($host, $username, $password, $database);

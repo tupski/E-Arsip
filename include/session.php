@@ -16,38 +16,39 @@ class SessionManager {
         if (self::$initialized) {
             return;
         }
-        
+
         self::$session_lifetime = env_int('SESSION_LIFETIME', 3600);
         self::$session_name = env('SESSION_NAME', 'EARSIP_SESSION');
-        
-        // Configure session security settings
-        ini_set('session.cookie_httponly', 1);
-        ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
-        ini_set('session.use_strict_mode', 1);
-        ini_set('session.cookie_samesite', 'Strict');
-        ini_set('session.use_only_cookies', 1);
-        ini_set('session.entropy_length', 32);
-        ini_set('session.hash_function', 'sha256');
-        
-        // Set session name and cookie parameters
-        session_name(self::$session_name);
-        session_set_cookie_params([
-            'lifetime' => self::$session_lifetime,
-            'path' => '/',
-            'domain' => '',
-            'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
-            'httponly' => true,
-            'samesite' => 'Strict'
-        ]);
-        
+
         // Start session if not already started
         if (session_status() == PHP_SESSION_NONE) {
+            // Configure session security settings before starting
+            @ini_set('session.cookie_httponly', 1);
+            @ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+            @ini_set('session.use_strict_mode', 1);
+            @ini_set('session.cookie_samesite', 'Strict');
+            @ini_set('session.use_only_cookies', 1);
+
+            // Set session name and cookie parameters
+            @session_name(self::$session_name);
+            @session_set_cookie_params([
+                'lifetime' => self::$session_lifetime,
+                'path' => '/',
+                'domain' => '',
+                'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+
+            // Start session
             session_start();
         }
-        
-        // Initialize session security
-        self::initSessionSecurity();
-        
+
+        // Initialize session security only if we can
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            self::initSessionSecurity();
+        }
+
         self::$initialized = true;
     }
     

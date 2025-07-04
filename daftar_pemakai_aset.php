@@ -454,7 +454,7 @@ if(!isset($_SESSION['admin'])){
                                                       </a>';
                                             }
                                             
-                                            echo '<a href="pdf_berita_acara.php?id='.$row['id_berita_acara'].'" target="_blank" class="btn btn-secondary">
+                                            echo '<a href="download_pdf.php?id='.$row['id_berita_acara'].'" target="_blank" class="btn btn-secondary" title="Download PDF">
                                                     <i class="material-icons" style="font-size: 16px;">file_download</i>
                                                   </a>';
                                         } else {
